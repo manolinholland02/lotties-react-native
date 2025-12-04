@@ -1,17 +1,23 @@
-import { StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { CTAButton } from "./components/CTAButton";
 import { palette } from "./constants/colors";
 
 export default function Index() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Hello world</Text>
-      <CTAButton label="Continue" onPress={() => {}} />
-    </View>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <Text style={styles.text}>Hello world</Text>
+        <CTAButton label="Continue" onPress={() => {}} />
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: palette.background.main,
+  },
   container: {
     flex: 1,
     justifyContent: "center",
