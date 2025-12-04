@@ -8,8 +8,12 @@ import {
   useWindowDimensions,
 } from "react-native";
 import React from "react";
+import { FontAwesome } from "@expo/vector-icons";
 import { CTAButton } from "../src/components/CTAButton";
 import { LottiesLogo } from "../src/components/LottiesLogo";
+import { MainHeading } from "../src/components/MainHeading";
+import { ParagraphRegular } from "../src/components/ParagraphRegular";
+import { FlatButton } from "../src/components/FlatButton";
 import { palette } from "../src/constants/colors";
 import { typography } from "../src/constants/typography";
 
@@ -24,6 +28,8 @@ export default function Index() {
   // Responsive sizing from the 393x852 reference
   const logoWidth = width * (201 / 393);
   const logoHeight = height * (101 / 852);
+  const buttonWidth = width * (313 / 393);
+  const buttonHeight = height * (50 / 852);
   const initialLogoTop = centerLine - logoHeight;
   const targetLogoTop = 10 + insets.top;
   const logoTranslateY = progress.interpolate({
@@ -33,6 +39,26 @@ export default function Index() {
   const subtitleOpacity = progress.interpolate({
     inputRange: [0, 1],
     outputRange: [1, 0],
+  });
+  const nextOpacity = progress.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 1],
+  });
+  const nextTranslateY = progress.interpolate({
+    inputRange: [0, 1],
+    outputRange: [20, 0],
+  });
+  const gapBetweenTexts = 15;
+  const [headingHeight, setHeadingHeight] = React.useState(0);
+  const contentTop = centerLine - headingHeight - gapBetweenTexts / 2;
+  const authGap = 20;
+  const ctaPrimaryOpacity = progress.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 0],
+  });
+  const ctaSecondaryOpacity = progress.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 1],
   });
 
   const handleStart = () => {
@@ -60,8 +86,73 @@ export default function Index() {
         >
           Jouw cyclusapp
         </Animated.Text>
-        <View style={[styles.ctaWrapper, { bottom: 30 }]}>
-          <CTAButton label="Begin nu" onPress={handleStart} />
+        <Animated.View
+          style={[
+            styles.nextContent,
+            {
+              top: contentTop,
+              opacity: nextOpacity,
+              transform: [{ translateY: nextTranslateY }],
+            },
+          ]}
+        >
+          <MainHeading
+            onLayout={(event) => setHeadingHeight(event.nativeEvent.layout.height)}
+          >
+            Account aanmaken
+          </MainHeading>
+          <ParagraphRegular style={styles.nextSubtitle}>
+            Registreer je om je menstruatie en stemming eenvoudig te volgen.
+          </ParagraphRegular>
+        </Animated.View>
+        <View style={[styles.ctaArea, { bottom: 30, width: buttonWidth }]}>
+          <Animated.View
+            style={[
+              styles.primaryButton,
+              {
+                opacity: ctaPrimaryOpacity,
+                width: buttonWidth,
+                top: (buttonHeight + authGap) * 2,
+              },
+            ]}
+            pointerEvents="box-none"
+          >
+            <CTAButton label="Begin nu" onPress={handleStart} />
+          </Animated.View>
+          <Animated.View
+            style={[
+              styles.authButtons,
+              { opacity: ctaSecondaryOpacity, width: buttonWidth, gap: authGap },
+            ]}
+          >
+            <FlatButton
+              label="Doorgaan met Apple"
+              width={buttonWidth}
+              height={buttonHeight}
+              backgroundColor={palette.primary.black}
+              textColor={palette.primary.white}
+              borderRadius={0}
+              icon={<FontAwesome name="apple" size={24} color={palette.primary.white} />}
+            />
+            <FlatButton
+              label="Doorgaan met Google"
+              width={buttonWidth}
+              height={buttonHeight}
+              backgroundColor={palette.primary.white}
+              textColor="#3C4043"
+              borderRadius={0}
+              icon={<FontAwesome name="google" size={24} color="#3C4043" />}
+            />
+            <FlatButton
+              label="Doorgaan met e-mail"
+              width={buttonWidth}
+              height={buttonHeight}
+              backgroundColor={palette.background.navigation}
+              textColor={palette.primary.black}
+              borderRadius={0}
+              icon={<FontAwesome name="envelope-o" size={22} color={palette.primary.black} />}
+            />
+          </Animated.View>
         </View>
       </View>
     </SafeAreaView>
@@ -90,8 +181,25 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     fontSize: 18,
   },
-  ctaWrapper: {
+  nextContent: {
     position: "absolute",
     alignSelf: "center",
+    width: "80%",
+  },
+  nextSubtitle: {
+    marginTop: 15,
+  },
+  ctaArea: {
+    position: "absolute",
+    alignSelf: "center",
+  },
+  primaryButton: {
+    position: "absolute",
+    top: 0,
+    alignSelf: "center",
+  },
+  authButtons: {
+    flexDirection: "column",
+    alignItems: "center",
   },
 });
