@@ -1,2 +1,2 @@
 # lotties-react-native
-testing protection rules for main branch
+testing protection rules for main branch, again
