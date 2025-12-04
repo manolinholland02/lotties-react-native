@@ -1,11 +1,13 @@
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { CTAButton } from "./components/CTAButton";
+import { LottiesLogo } from "./components/LottiesLogo";
 import { palette } from "./constants/colors";
 
 export default function Index() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
+        <LottiesLogo width={240} height={120} />
         <Text style={styles.text}>Hello world</Text>
         <CTAButton label="Continue" onPress={() => {}} />
       </View>
