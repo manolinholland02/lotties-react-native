@@ -6,9 +6,15 @@ type CTAButtonProps = {
   label: string;
   onPress?: () => void;
   disabled?: boolean;
+  backgroundColor?: string;
 };
 
-export function CTAButton({ label, onPress, disabled = false }: CTAButtonProps) {
+export function CTAButton({
+  label,
+  onPress,
+  disabled = false,
+  backgroundColor = palette.cta.primary,
+}: CTAButtonProps) {
   const { width, height } = useWindowDimensions();
 
   // Scale relative to the 393x852 reference frame from the design spec.
@@ -26,6 +32,7 @@ export function CTAButton({ label, onPress, disabled = false }: CTAButtonProps) 
         {
           width: buttonWidth,
           height: buttonHeight,
+          backgroundColor,
           opacity: disabled ? 0.6 : pressed ? 0.9 : 1,
         },
       ]}
@@ -40,7 +47,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: palette.cta.primary,
   },
   label: {
     color: palette.primary.white,

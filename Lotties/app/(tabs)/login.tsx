@@ -12,15 +12,18 @@ import {
   useSafeAreaInsets,
   initialWindowMetrics,
 } from "react-native-safe-area-context";
+import { FontAwesome } from "@expo/vector-icons";
 import { CTAButton } from "../../src/components/CTAButton";
 import { LottiesLogo } from "../../src/components/LottiesLogo";
+import { MainHeading } from "../../src/components/MainHeading";
 import { ParagraphRegular } from "../../src/components/ParagraphRegular";
 import { palette } from "../../src/constants/colors";
 import { typography } from "../../src/constants/typography";
-import { mockUsers } from "../../src/data/mockUsers";
 import { useAuth } from "../../src/state/AuthContext";
 
 const screen = Dimensions.get("window");
+const inputWidth = React.useRef(screen.width * (353 / 393)).current;
+const inputHeight = React.useRef(screen.height * (51 / 852)).current;
 
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
@@ -37,6 +40,8 @@ export default function LoginScreen() {
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
   const [message, setMessage] = React.useState<string | null>(null);
+  const canSubmit = email.trim().length > 0 && password.trim().length > 0;
+  const ctaBottom = 30;
 
   const handleLogin = () => {
     const ok = auth.login(email, password);
@@ -47,7 +52,7 @@ export default function LoginScreen() {
     }
   };
 
-  const formTop = logoTop + logoHeight + 40;
+  const formTop = logoTop + logoHeight + 20;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -58,52 +63,79 @@ export default function LoginScreen() {
           style={[styles.logo, { top: logoTop }]}
         />
         <View style={[styles.form, { marginTop: formTop }]}>
-          <ParagraphRegular style={styles.label}>E-mail</ParagraphRegular>
-          <TextInput
-            value={email}
-            onChangeText={setEmail}
-            placeholder="jij@example.com"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-            style={styles.input}
-          />
-          <ParagraphRegular style={[styles.label, { marginTop: 16 }]}>
-            Wachtwoord
-          </ParagraphRegular>
-          <View style={styles.passwordRow}>
-            <TextInput
-              value={password}
-              onChangeText={setPassword}
-              placeholder="••••••••"
-              secureTextEntry={!showPassword}
-              autoCapitalize="none"
-              style={[styles.input, styles.passwordInput]}
-            />
-            <Pressable
-              onPress={() => setShowPassword((prev) => !prev)}
-              hitSlop={10}
-              style={styles.showButton}
+          <MainHeading style={styles.heading}>Log in</MainHeading>
+          <View style={styles.signupPrompt}>
+            <ParagraphRegular style={styles.signupQuestion}>
+              Nog geen account?
+            </ParagraphRegular>
+            <ParagraphRegular
+              fontWeight="600"
+              color={palette.cta.primary}
+              style={styles.signupLink}
             >
-              <Text style={styles.showButtonText}>
-                {showPassword ? "Verberg" : "Toon"}
-              </Text>
-            </Pressable>
+              Account aanmaken
+            </ParagraphRegular>
           </View>
-          <View style={styles.loginButton}>
-            <CTAButton label="Log in" onPress={handleLogin} />
+          <View style={styles.formContent}>
+            <View style={[styles.inputWrapper, { width: inputWidth, height: inputHeight }]}>
+              <FontAwesome
+                name="envelope-o"
+                size={18}
+                color={palette.text.abstract}
+                style={styles.inputIcon}
+              />
+              <TextInput
+                value={email}
+                onChangeText={setEmail}
+                placeholder="Vul je e-mail in"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                placeholderTextColor={palette.text.abstract}
+                style={[styles.input, styles.inputWithIcon]}
+              />
+            </View>
+            <View style={[styles.passwordRow, { width: inputWidth, height: inputHeight, marginTop: 20 }]}>
+              <FontAwesome
+                name="lock"
+                size={20}
+                color={palette.text.abstract}
+                style={styles.inputIcon}
+              />
+              <TextInput
+                value={password}
+                onChangeText={setPassword}
+                placeholder="Voer je wachtwoord in"
+                secureTextEntry={!showPassword}
+                autoCapitalize="none"
+                placeholderTextColor={palette.text.abstract}
+                style={[styles.input, styles.passwordInput, styles.inputWithIcon]}
+              />
+              <Pressable
+                onPress={() => setShowPassword((prev) => !prev)}
+                hitSlop={10}
+                style={styles.showButton}
+              >
+                <FontAwesome
+                  name={showPassword ? "eye-slash" : "eye"}
+                  size={20}
+                  color={palette.text.abstract}
+                />
+              </Pressable>
+            </View>
+            <ParagraphRegular style={styles.forgotPassword}>
+              Wachtwoord vergeten?
+            </ParagraphRegular>
           </View>
           {message ? <Text style={styles.message}>{message}</Text> : null}
-          <View style={styles.usersList}>
-            <ParagraphRegular style={styles.usersTitle}>
-              Beschikbare accounts:
-            </ParagraphRegular>
-            {mockUsers.map((u) => (
-              <Text key={u.email} style={styles.userItem}>
-                {u.email} / {u.password}
-              </Text>
-            ))}
-          </View>
+        </View>
+        <View style={[styles.loginButton, { bottom: ctaBottom }]}>
+          <CTAButton
+            label="Inloggen"
+            onPress={handleLogin}
+            disabled={!canSubmit}
+            backgroundColor={canSubmit ? palette.cta.primary : palette.text.abstract}
+          />
         </View>
       </View>
     </SafeAreaView>
@@ -125,63 +157,87 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   form: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
+    paddingBottom: 120,
   },
-  label: {
-    textAlign: "left",
+  heading: {
+    textAlign: "center",
+  },
+  formContent: {
+    marginTop: 30,
+  },
+  inputWrapper: {
+    alignSelf: "center",
+    justifyContent: "center",
   },
   input: {
-    marginTop: 8,
+    marginTop: 0,
     borderWidth: 1,
-    borderColor: palette.text.secondary,
+    borderColor: palette.text.abstract,
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 12,
-    fontFamily: typography.fontFamily.paragraph,
+    fontFamily: typography.fontFamily.main,
+    fontWeight: "400",
     fontSize: 16,
     color: palette.text.main,
-    backgroundColor: palette.primary.white,
+    backgroundColor: "transparent",
+  },
+  inputWithIcon: {
+    paddingLeft: 40,
+    width: "100%",
+    height: "100%",
+  },
+  inputIcon: {
+    position: "absolute",
+    left: 10,
+    zIndex: 1,
   },
   passwordRow: {
     flexDirection: "row",
     alignItems: "center",
+    position: "relative",
+    alignSelf: "center",
   },
   passwordInput: {
     flex: 1,
+    width: "100%",
+    paddingRight: 60,
+  },
+  forgotPassword: {
+    marginTop: 10,
+    alignSelf: "flex-end",
+    fontSize: 12,
+    fontWeight: "500",
+    color: palette.cta.primary,
   },
   showButton: {
-    marginLeft: 12,
-    paddingHorizontal: 10,
+    position: "absolute",
+    right: 0,
+    paddingHorizontal: 14,
     paddingVertical: 8,
     justifyContent: "center",
     alignItems: "center",
-  },
-  showButtonText: {
-    color: palette.cta.primary,
-    fontFamily: typography.fontFamily.paragraph,
-    fontWeight: "700",
-    fontSize: 14,
+    height: "100%",
   },
   loginButton: {
-    marginTop: 24,
+    position: "absolute",
+    alignSelf: "center",
+  },
+  signupPrompt: {
+    marginTop: 15,
     alignItems: "center",
+  },
+  signupQuestion: {
+    textAlign: "center",
+  },
+  signupLink: {
+    marginTop: 0,
+    textAlign: "center",
   },
   message: {
     marginTop: 16,
     textAlign: "center",
-    color: palette.text.main,
-    fontFamily: typography.fontFamily.paragraph,
-    fontSize: 14,
-  },
-  usersList: {
-    marginTop: 24,
-    gap: 6,
-  },
-  usersTitle: {
-    textAlign: "left",
-    fontWeight: "700",
-  },
-  userItem: {
     color: palette.text.main,
     fontFamily: typography.fontFamily.paragraph,
     fontSize: 14,
