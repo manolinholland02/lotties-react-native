@@ -66,7 +66,7 @@ export default function HomeScreen() {
     Animated.timing(progress, {
       toValue: 1,
       duration: 600,
-      easing: Easing.out(Easing.cubic),
+      easing: Easing.linear,
       useNativeDriver: true,
     }).start();
   };
