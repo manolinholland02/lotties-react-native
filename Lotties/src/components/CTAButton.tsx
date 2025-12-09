@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, useWindowDimensions } from "react-native";
 import { palette } from "../constants/colors";
 import { typography } from "../constants/typography";
-import { hs, vs } from "../utils/scale";
+import { hs, ms } from "../utils/scale";
 
 type CTAButtonProps = {
   label: string;
@@ -16,11 +16,13 @@ export function CTAButton({
   disabled = false,
   backgroundColor = palette.cta.primary,
 }: CTAButtonProps) {
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
 
   // Scale relative to the 393x852 reference frame from the design spec.
-  const buttonWidth = hs(313, width);
-  const buttonHeight = vs(50, height);
+  // Use horizontal scaling with a soft cap to avoid stretching on larger screens.
+  const buttonWidth = Math.min(hs(313, width), 340);
+  // Keep height near the Figma 50px while allowing gentle adjustment across widths.
+  const buttonHeight = ms(50, 0.2, width);
 
   return (
     <Pressable
@@ -51,7 +53,7 @@ const styles = StyleSheet.create({
   },
   label: {
     color: palette.primary.white,
-    fontFamily: typography.fontFamily.paragraph,
+    fontFamily: typography.fontFamily.secondary,
     fontWeight: "700",
     fontSize: 18,
     textAlign: "center",

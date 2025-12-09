@@ -111,7 +111,7 @@ export default function HomeScreen() {
             Registreer je om je menstruatie en stemming eenvoudig te volgen.
           </ParagraphRegular>
         </Animated.View>
-        <View style={[styles.ctaArea, { bottom: 30, width: buttonWidth }]}>
+        <View style={[styles.ctaArea, { bottom: 10, width: buttonWidth }]}>
           <Animated.View
             style={[
               styles.primaryButton,
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     alignSelf: "center",
     color: palette.text.main,
-    fontFamily: typography.fontFamily.paragraph,
+    fontFamily: typography.fontFamily.secondary,
     fontWeight: "400",
     fontSize: 18,
   },

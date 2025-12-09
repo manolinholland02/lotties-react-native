@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   label: {
-    fontFamily: typography.fontFamily.paragraph,
+    fontFamily: typography.fontFamily.secondary,
     fontWeight: "700",
     fontSize: 18,
     textAlign: "center",

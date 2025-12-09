@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     textAlign: "center",
     color: palette.text.main,
-    fontFamily: typography.fontFamily.paragraph,
+    fontFamily: typography.fontFamily.secondary,
     fontSize: 14,
   },
 });

@@ -1,7 +1,7 @@
 export const typography = {
   fontFamily: {
     main: "Roboto",
-    paragraph: "Open Sans",
+    secondary: "Open Sans",
   },
 } as const;
 
