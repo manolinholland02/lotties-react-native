@@ -21,6 +21,7 @@ import { palette } from "../../src/constants/colors";
 import { typography } from "../../src/constants/typography";
 import { useAuth } from "../../src/state/AuthContext";
 import { hs, ms, vs } from "../../src/utils/scale";
+import { getLogoSize } from "../../src/utils/logo";
 
 const screen = Dimensions.get("window");
 const inputWidth = React.useRef(hs(353, screen.width)).current;
@@ -28,11 +29,17 @@ const inputHeight = React.useRef(vs(51, screen.height)).current;
 
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
+  const resolvedInsets = React.useMemo(
+    () => initialWindowMetrics?.insets ?? insets,
+    [insets]
+  );
   const auth = useAuth();
 
   // Keep logo size and position stable
-  const logoWidth = React.useRef(hs(201, screen.width)).current;
-  const logoHeight = React.useRef(logoWidth * (101 / 201)).current;
+  const { logoWidth, logoHeight } = React.useMemo(
+    () => getLogoSize(screen.width),
+    []
+  );
   // Position at the top edge of the SafeAreaView (0px from the safe area's top).
   const logoTop = React.useRef(0).current;
 
@@ -55,7 +62,16 @@ export default function LoginScreen() {
   const formTop = logoTop + logoHeight + 20;
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView
+      edges={[]}
+      style={[
+        styles.safeArea,
+        {
+          paddingTop: resolvedInsets.top,
+          paddingBottom: resolvedInsets.bottom,
+        },
+      ]}
+    >
       <View style={styles.container}>
         <LottiesLogo
           width={logoWidth}

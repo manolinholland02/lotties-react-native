@@ -17,6 +17,7 @@ import { FlatButton } from "../../src/components/FlatButton";
 import { palette } from "../../src/constants/colors";
 import { typography } from "../../src/constants/typography";
 import { hs, ms, vs } from "../../src/utils/scale";
+import { getLogoSize } from "../../src/utils/logo";
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
@@ -27,8 +28,7 @@ export default function HomeScreen() {
   const availableHeight = height - insets.top - insets.bottom;
   const centerLine = availableHeight / 2;
 
-  const logoWidth = hs(201, width);
-  const logoHeight = logoWidth * (101 / 201);
+  const { logoWidth, logoHeight } = getLogoSize(width);
   const buttonWidth = hs(313, width);
   const buttonHeight = vs(50, height);
   const initialLogoTop = centerLine - logoHeight;
@@ -53,7 +53,7 @@ export default function HomeScreen() {
   const [loginRowHeight, setLoginRowHeight] = React.useState(0);
   const textGap = ms(15, 0.2);
   const contentTop = centerLine - headingHeight - textGap;
-  const authGap = 20;
+  const authGap = ms(20, 0.2);
   const ctaPrimaryOpacity = progress.interpolate({
     inputRange: [0, 1],
     outputRange: [1, 0],
@@ -138,7 +138,7 @@ export default function HomeScreen() {
               <ParagraphRegular>Heb je al een account?</ParagraphRegular>
               <ParagraphRegular
                 color={palette.cta.primary}
-                fontWeight="600"
+                fontWeight="700"
                 style={styles.loginLink}
                 onPress={handleLoginNavigate}
               >

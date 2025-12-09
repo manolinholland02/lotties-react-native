@@ -1,5 +1,13 @@
 import React from "react";
-import { View, Text, StyleSheet, ViewStyle, TextStyle } from "react-native";
+import {
+  Pressable,
+  PressableProps,
+  Text,
+  StyleSheet,
+  View,
+  ViewStyle,
+  TextStyle,
+} from "react-native";
 import { palette } from "../constants/colors";
 import { typography } from "../constants/typography";
 import { ms } from "../utils/scale";
@@ -14,6 +22,8 @@ type FlatButtonProps = {
   icon?: React.ReactNode;
   style?: ViewStyle | ViewStyle[];
   textStyle?: TextStyle | TextStyle[];
+  disabled?: boolean;
+  onPress?: PressableProps["onPress"];
 };
 
 export function FlatButton({
@@ -26,18 +36,30 @@ export function FlatButton({
   icon,
   style,
   textStyle,
+  disabled = false,
+  onPress,
 }: FlatButtonProps) {
   return (
-    <View
-      style={[
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ disabled }}
+      disabled={disabled}
+      onPress={onPress}
+      style={({ pressed }) => [
         styles.container,
-        { width, height, backgroundColor, borderRadius },
+        {
+          width,
+          height,
+          backgroundColor,
+          borderRadius,
+          opacity: disabled ? 0.6 : pressed ? 0.85 : 1,
+        },
         style,
       ]}
     >
       {icon ? <View style={styles.iconWrapper}>{icon}</View> : null}
       <Text style={[styles.label, { color: textColor }, textStyle]}>{label}</Text>
-    </View>
+    </Pressable>
   );
 }
 
