@@ -16,7 +16,7 @@ import { ParagraphRegular } from "../../src/components/ParagraphRegular";
 import { FlatButton } from "../../src/components/FlatButton";
 import { palette } from "../../src/constants/colors";
 import { typography } from "../../src/constants/typography";
-import { hs, vs } from "../../src/utils/scale";
+import { hs, ms, vs } from "../../src/utils/scale";
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
@@ -49,10 +49,10 @@ export default function HomeScreen() {
     inputRange: [0, 1],
     outputRange: [20, 0],
   });
-  const gapBetweenTexts = 15;
   const [headingHeight, setHeadingHeight] = React.useState(0);
   const [loginRowHeight, setLoginRowHeight] = React.useState(0);
-  const contentTop = centerLine - headingHeight - gapBetweenTexts / 2;
+  const textGap = ms(15, 0.2);
+  const contentTop = centerLine - headingHeight - textGap;
   const authGap = 20;
   const ctaPrimaryOpacity = progress.interpolate({
     inputRange: [0, 1],
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     width: "80%",
   },
   nextSubtitle: {
-    marginTop: 15,
+    marginTop: ms(15, 0.2),
   },
   ctaArea: {
     position: "absolute",
