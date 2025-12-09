@@ -32,10 +32,9 @@ export default function LoginScreen() {
 
   // Keep logo size and position stable
   const logoWidth = React.useRef(hs(201, screen.width)).current;
-  const logoHeight = React.useRef(vs(101, screen.height)).current;
-  const logoTop = React.useRef(
-    10 + (initialWindowMetrics?.insets.top ?? insets.top ?? 0)
-  ).current;
+  const logoHeight = React.useRef(logoWidth * (101 / 201)).current;
+  // Position at the top edge of the SafeAreaView (0px from the safe area's top).
+  const logoTop = React.useRef(0).current;
 
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");

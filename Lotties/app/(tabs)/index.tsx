@@ -28,11 +28,11 @@ export default function HomeScreen() {
   const centerLine = availableHeight / 2;
 
   const logoWidth = hs(201, width);
-  const logoHeight = vs(101, height);
+  const logoHeight = logoWidth * (101 / 201);
   const buttonWidth = hs(313, width);
   const buttonHeight = vs(50, height);
   const initialLogoTop = centerLine - logoHeight;
-  const targetLogoTop = 10 + insets.top;
+  const targetLogoTop = 0;
   const logoTranslateY = progress.interpolate({
     inputRange: [0, 1],
     outputRange: [0, targetLogoTop - initialLogoTop],
@@ -66,7 +66,7 @@ export default function HomeScreen() {
   const handleStart = () => {
     Animated.timing(progress, {
       toValue: 1,
-      duration: 600,
+      duration: 300,
       easing: Easing.linear,
       useNativeDriver: true,
     }).start();

@@ -2,6 +2,7 @@ import React from "react";
 import { Text, TextProps, StyleSheet } from "react-native";
 import { palette } from "../constants/colors";
 import { typography } from "../constants/typography";
+import { ms } from "../utils/scale";
 
 type ParagraphProps = TextProps & {
   children: React.ReactNode;
@@ -25,8 +26,9 @@ export function ParagraphRegular({
 
 const styles = StyleSheet.create({
   text: {
-    fontFamily: typography.fontFamily.paragraph,
-    fontSize: 18,
+    fontFamily: typography.fontFamily.main,
+    fontSize: ms(18, 0.2),
+    lineHeight: ms(22, 0.2),
     textAlign: "center",
   },
 });
