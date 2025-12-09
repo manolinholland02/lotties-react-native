@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     color: palette.primary.white,
     fontFamily: typography.fontFamily.secondary,
     fontWeight: "700",
-    fontSize: 18,
+    fontSize: ms(18, 0.2),
     textAlign: "center",
   },
 });

@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     color: palette.text.main,
     fontFamily: typography.fontFamily.secondary,
     fontWeight: "400",
-    fontSize: 18,
+    fontSize: ms(18, 0.2),
   },
   nextContent: {
     position: "absolute",

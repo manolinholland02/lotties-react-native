@@ -20,7 +20,7 @@ import { ParagraphRegular } from "../../src/components/ParagraphRegular";
 import { palette } from "../../src/constants/colors";
 import { typography } from "../../src/constants/typography";
 import { useAuth } from "../../src/state/AuthContext";
-import { hs, vs } from "../../src/utils/scale";
+import { hs, ms, vs } from "../../src/utils/scale";
 
 const screen = Dimensions.get("window");
 const inputWidth = React.useRef(hs(353, screen.width)).current;
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     fontFamily: typography.fontFamily.main,
     fontWeight: "400",
-    fontSize: 16,
+    fontSize: ms(16, 0.2),
     color: palette.text.main,
     backgroundColor: "transparent",
   },
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   forgotPassword: {
     marginTop: 10,
     alignSelf: "flex-end",
-    fontSize: 12,
+    fontSize: ms(12, 0.2),
     fontWeight: "500",
     color: palette.cta.primary,
   },
@@ -240,6 +240,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: palette.text.main,
     fontFamily: typography.fontFamily.secondary,
-    fontSize: 14,
+    fontSize: ms(14, 0.2),
   },
 });

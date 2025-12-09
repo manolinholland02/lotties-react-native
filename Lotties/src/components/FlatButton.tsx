@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, ViewStyle, TextStyle } from "react-native";
 import { palette } from "../constants/colors";
 import { typography } from "../constants/typography";
+import { ms } from "../utils/scale";
 
 type FlatButtonProps = {
   label: string;
@@ -58,7 +59,7 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: typography.fontFamily.secondary,
     fontWeight: "700",
-    fontSize: 18,
+    fontSize: ms(18, 0.2),
     textAlign: "center",
   },
 });
