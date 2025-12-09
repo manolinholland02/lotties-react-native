@@ -20,18 +20,19 @@ import { ParagraphRegular } from "../../src/components/ParagraphRegular";
 import { palette } from "../../src/constants/colors";
 import { typography } from "../../src/constants/typography";
 import { useAuth } from "../../src/state/AuthContext";
+import { hs, vs } from "../../src/utils/scale";
 
 const screen = Dimensions.get("window");
-const inputWidth = React.useRef(screen.width * (353 / 393)).current;
-const inputHeight = React.useRef(screen.height * (51 / 852)).current;
+const inputWidth = React.useRef(hs(353, screen.width)).current;
+const inputHeight = React.useRef(vs(51, screen.height)).current;
 
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
   const auth = useAuth();
 
   // Keep logo size and position stable
-  const logoWidth = React.useRef(screen.width * (201 / 393)).current;
-  const logoHeight = React.useRef(screen.height * (101 / 852)).current;
+  const logoWidth = React.useRef(hs(201, screen.width)).current;
+  const logoHeight = React.useRef(vs(101, screen.height)).current;
   const logoTop = React.useRef(
     10 + (initialWindowMetrics?.insets.top ?? insets.top ?? 0)
   ).current;

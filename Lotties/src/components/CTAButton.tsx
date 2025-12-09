@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, useWindowDimensions } from "react-native";
 import { palette } from "../constants/colors";
 import { typography } from "../constants/typography";
+import { hs, vs } from "../utils/scale";
 
 type CTAButtonProps = {
   label: string;
@@ -18,8 +19,8 @@ export function CTAButton({
   const { width, height } = useWindowDimensions();
 
   // Scale relative to the 393x852 reference frame from the design spec.
-  const buttonWidth = width * (313 / 393);
-  const buttonHeight = height * (50 / 852);
+  const buttonWidth = hs(313, width);
+  const buttonHeight = vs(50, height);
 
   return (
     <Pressable

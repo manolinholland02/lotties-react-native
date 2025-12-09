@@ -16,6 +16,7 @@ import { ParagraphRegular } from "../../src/components/ParagraphRegular";
 import { FlatButton } from "../../src/components/FlatButton";
 import { palette } from "../../src/constants/colors";
 import { typography } from "../../src/constants/typography";
+import { hs, vs } from "../../src/utils/scale";
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
@@ -26,10 +27,10 @@ export default function HomeScreen() {
   const availableHeight = height - insets.top - insets.bottom;
   const centerLine = availableHeight / 2;
 
-  const logoWidth = width * (201 / 393);
-  const logoHeight = height * (101 / 852);
-  const buttonWidth = width * (313 / 393);
-  const buttonHeight = height * (50 / 852);
+  const logoWidth = hs(201, width);
+  const logoHeight = vs(101, height);
+  const buttonWidth = hs(313, width);
+  const buttonHeight = vs(50, height);
   const initialLogoTop = centerLine - logoHeight;
   const targetLogoTop = 10 + insets.top;
   const logoTranslateY = progress.interpolate({
