@@ -15,6 +15,7 @@ import { MainHeading } from "../../src/components/MainHeading";
 import { ParagraphRegular } from "../../src/components/ParagraphRegular";
 import { FlatButton } from "../../src/components/FlatButton";
 import { palette } from "../../src/constants/colors";
+import { layout } from "../../src/constants/layout";
 import { typography } from "../../src/constants/typography";
 import { hs, ms, vs } from "../../src/utils/scale";
 import { getLogoSize } from "../../src/utils/logo";
@@ -111,7 +112,7 @@ export default function HomeScreen() {
             Registreer je om je menstruatie en stemming eenvoudig te volgen.
           </ParagraphRegular>
         </Animated.View>
-        <View style={[styles.ctaArea, { bottom: 10, width: buttonWidth }]}>
+        <View style={[styles.ctaArea, { bottom: layout.ctaBottom, width: buttonWidth }]}>
           <Animated.View
             style={[
               styles.primaryButton,

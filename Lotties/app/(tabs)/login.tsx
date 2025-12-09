@@ -4,7 +4,6 @@ import {
   Pressable,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
 import {
@@ -14,18 +13,23 @@ import {
 } from "react-native-safe-area-context";
 import { FontAwesome } from "@expo/vector-icons";
 import { CTAButton } from "../../src/components/CTAButton";
+import { FormField } from "../../src/components/FormField";
 import { LottiesLogo } from "../../src/components/LottiesLogo";
 import { MainHeading } from "../../src/components/MainHeading";
 import { ParagraphRegular } from "../../src/components/ParagraphRegular";
 import { palette } from "../../src/constants/colors";
+import { layout } from "../../src/constants/layout";
+import { spacing } from "../../src/constants/spacing";
 import { typography } from "../../src/constants/typography";
 import { useAuth } from "../../src/state/AuthContext";
-import { hs, ms, vs } from "../../src/utils/scale";
+import { mockUsers } from "../../src/data/mockUsers";
+import { hs, ms } from "../../src/utils/scale";
 import { getLogoSize } from "../../src/utils/logo";
 
 const screen = Dimensions.get("window");
-const inputWidth = React.useRef(hs(353, screen.width)).current;
-const inputHeight = React.useRef(vs(51, screen.height)).current;
+const inputWidth = React.useRef(Math.min(hs(353, screen.width), 370)).current;
+const inputHeight = React.useRef(ms(51, 0.2, screen.width)).current;
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
@@ -47,15 +51,42 @@ export default function LoginScreen() {
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
   const [message, setMessage] = React.useState<string | null>(null);
-  const canSubmit = email.trim().length > 0 && password.trim().length > 0;
-  const ctaBottom = 30;
+  const [emailError, setEmailError] = React.useState<string>("");
+  const [passwordError, setPasswordError] = React.useState<string>("");
+  const canSubmit =
+    email.trim().length > 0 && password.trim().length > 0 && emailRegex.test(email.trim());
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    setEmailError("");
+    setPasswordError("");
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    setPasswordError("");
+  };
 
   const handleLogin = () => {
+    const trimmed = email.trim();
+    if (!emailRegex.test(trimmed)) {
+      setEmailError("Voer een geldig e-mailadres in.");
+      return;
+    }
+    const exists = mockUsers.some(
+      (u) => u.email.toLowerCase() === trimmed.toLowerCase()
+    );
+    if (!exists) {
+      setEmailError("Dit e-mailadres is niet bekend");
+      return;
+    }
     const ok = auth.login(email, password);
     if (ok) {
+      setPasswordError("");
       setMessage("Succesvol ingelogd!");
     } else {
-      setMessage("Ongeldige inloggegevens. Probeer opnieuw.");
+      setPasswordError("Verkeerd wachtwoord");
+      setMessage(null);
     }
   };
 
@@ -85,7 +116,7 @@ export default function LoginScreen() {
               Nog geen account?
             </ParagraphRegular>
             <ParagraphRegular
-              fontWeight="600"
+              fontWeight="700"
               color={palette.cta.primary}
               style={styles.signupLink}
             >
@@ -93,59 +124,63 @@ export default function LoginScreen() {
             </ParagraphRegular>
           </View>
           <View style={styles.formContent}>
-            <View style={[styles.inputWrapper, { width: inputWidth, height: inputHeight }]}>
-              <FontAwesome
-                name="envelope-o"
-                size={18}
-                color={palette.text.abstract}
-                style={styles.inputIcon}
-              />
-              <TextInput
-                value={email}
-                onChangeText={setEmail}
-                placeholder="Vul je e-mail in"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                placeholderTextColor={palette.text.abstract}
-                style={[styles.input, styles.inputWithIcon]}
-              />
-            </View>
-            <View style={[styles.passwordRow, { width: inputWidth, height: inputHeight, marginTop: 20 }]}>
-              <FontAwesome
-                name="lock"
-                size={20}
-                color={palette.text.abstract}
-                style={styles.inputIcon}
-              />
-              <TextInput
-                value={password}
-                onChangeText={setPassword}
-                placeholder="Voer je wachtwoord in"
-                secureTextEntry={!showPassword}
-                autoCapitalize="none"
-                placeholderTextColor={palette.text.abstract}
-                style={[styles.input, styles.passwordInput, styles.inputWithIcon]}
-              />
-              <Pressable
-                onPress={() => setShowPassword((prev) => !prev)}
-                hitSlop={10}
-                style={styles.showButton}
-              >
+            <FormField
+              width={inputWidth}
+              height={inputHeight}
+              value={email}
+              onChangeText={handleEmailChange}
+              placeholder="Vul je e-mail in"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              icon={
                 <FontAwesome
-                  name={showPassword ? "eye-slash" : "eye"}
-                  size={20}
+                  name="envelope-o"
+                  size={ms(18, 0.2)}
                   color={palette.text.abstract}
                 />
-              </Pressable>
-            </View>
-            <ParagraphRegular style={styles.forgotPassword}>
-              Wachtwoord vergeten?
-            </ParagraphRegular>
+              }
+              errorText={emailError}
+              style={styles.input}
+            />
+
+            <FormField
+              width={inputWidth}
+              height={inputHeight}
+              value={password}
+              onChangeText={handlePasswordChange}
+              placeholder="Voer je wachtwoord in"
+              secureTextEntry={!showPassword}
+              autoCapitalize="none"
+              icon={
+                <FontAwesome name="lock" size={ms(20, 0.2)} color={palette.text.abstract} />
+              }
+              errorText={passwordError}
+              containerStyle={{ marginTop: spacing.s }}
+              style={styles.input}
+              footerRight={
+                <ParagraphRegular style={styles.forgotPassword}>
+                  Wachtwoord vergeten?
+                </ParagraphRegular>
+              }
+              rightElement={
+                <Pressable
+                  onPress={() => setShowPassword((prev) => !prev)}
+                  hitSlop={10}
+                  style={styles.showButton}
+                >
+                  <FontAwesome
+                    name={showPassword ? "eye-slash" : "eye"}
+                    size={ms(20, 0.2)}
+                    color={palette.text.abstract}
+                  />
+                </Pressable>
+              }
+            />
           </View>
           {message ? <Text style={styles.message}>{message}</Text> : null}
         </View>
-        <View style={[styles.loginButton, { bottom: ctaBottom }]}>
+        <View style={[styles.loginButton, { bottom: layout.ctaBottom }]}>
           <CTAButton
             label="Inloggen"
             onPress={handleLogin}
@@ -180,52 +215,20 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   formContent: {
-    marginTop: 30,
-  },
-  inputWrapper: {
-    alignSelf: "center",
-    justifyContent: "center",
+    marginTop: ms(30, 0.2),
   },
   input: {
-    marginTop: 0,
-    borderWidth: 1,
-    borderColor: palette.text.abstract,
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
     fontFamily: typography.fontFamily.main,
     fontWeight: "400",
     fontSize: ms(16, 0.2),
     color: palette.text.main,
-    backgroundColor: "transparent",
-  },
-  inputWithIcon: {
-    paddingLeft: 40,
-    width: "100%",
-    height: "100%",
-  },
-  inputIcon: {
-    position: "absolute",
-    left: 10,
-    zIndex: 1,
-  },
-  passwordRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    position: "relative",
-    alignSelf: "center",
-  },
-  passwordInput: {
-    flex: 1,
-    width: "100%",
-    paddingRight: 60,
   },
   forgotPassword: {
-    marginTop: 10,
-    alignSelf: "flex-end",
     fontSize: ms(12, 0.2),
+    lineHeight: ms(16, 0.2),
     fontWeight: "500",
     color: palette.cta.primary,
+    textAlign: "right",
   },
   showButton: {
     position: "absolute",
@@ -241,7 +244,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   signupPrompt: {
-    marginTop: 15,
+    marginTop: ms(15, 0.2),
     alignItems: "center",
   },
   signupQuestion: {
@@ -250,6 +253,20 @@ const styles = StyleSheet.create({
   signupLink: {
     marginTop: 0,
     textAlign: "center",
+  },
+  emailErrorContainer: {
+    alignSelf: "center",
+    marginTop: ms(5, 0.2),
+    alignItems: "flex-start",
+  },
+  emailErrorText: {
+    minHeight: ms(18, 0.2),
+    fontFamily: typography.fontFamily.main,
+    fontWeight: "500",
+    fontSize: ms(15, 0.2),
+    lineHeight: ms(18, 0.2),
+    color: palette.primary.error,
+    textAlign: "left",
   },
   message: {
     marginTop: 16,

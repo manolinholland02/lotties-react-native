@@ -36,7 +36,7 @@ export function CTAButton({
           width: buttonWidth,
           height: buttonHeight,
           backgroundColor,
-          opacity: disabled ? 0.6 : pressed ? 0.9 : 1,
+          opacity: pressed ? 0.9 : 1,
         },
       ]}
     >
