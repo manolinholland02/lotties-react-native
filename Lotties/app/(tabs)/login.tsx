@@ -12,6 +12,7 @@ import {
   initialWindowMetrics,
 } from "react-native-safe-area-context";
 import { FontAwesome } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { CTAButton } from "../../src/components/CTAButton";
 import { FormField } from "../../src/components/FormField";
 import { LottiesLogo } from "../../src/components/LottiesLogo";
@@ -22,7 +23,6 @@ import { layout } from "../../src/constants/layout";
 import { spacing } from "../../src/constants/spacing";
 import { typography } from "../../src/constants/typography";
 import { useAuth } from "../../src/state/AuthContext";
-import { mockUsers } from "../../src/data/mockUsers";
 import { hs, ms } from "../../src/utils/scale";
 import { getLogoSize } from "../../src/utils/logo";
 
@@ -33,6 +33,7 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const resolvedInsets = React.useMemo(
     () => initialWindowMetrics?.insets ?? insets,
     [insets]
@@ -50,11 +51,15 @@ export default function LoginScreen() {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [message, setMessage] = React.useState<string | null>(null);
   const [emailError, setEmailError] = React.useState<string>("");
   const [passwordError, setPasswordError] = React.useState<string>("");
   const canSubmit =
     email.trim().length > 0 && password.trim().length > 0 && emailRegex.test(email.trim());
+  const handleNavigateToRegister = () => {
+    router.push("/(tabs)/register");
+  };
 
   const handleEmailChange = (value: string) => {
     setEmail(value);
@@ -73,21 +78,31 @@ export default function LoginScreen() {
       setEmailError("Voer een geldig e-mailadres in.");
       return;
     }
-    const exists = mockUsers.some(
-      (u) => u.email.toLowerCase() === trimmed.toLowerCase()
-    );
-    if (!exists) {
-      setEmailError("Dit e-mailadres is niet bekend");
-      return;
-    }
-    const ok = auth.login(email, password);
-    if (ok) {
-      setPasswordError("");
-      setMessage("Succesvol ingelogd!");
-    } else {
-      setPasswordError("Verkeerd wachtwoord");
-      setMessage(null);
-    }
+    setIsSubmitting(true);
+    setMessage(null);
+    setPasswordError("");
+    setEmailError("");
+    auth
+      .login(trimmed, password)
+      .then((result) => {
+        if (result.ok) {
+          setPasswordError("");
+          setMessage(null);
+          router.replace("/onboarding");
+        } else {
+          if (result.error?.includes("e-mailadres")) {
+            setEmailError(result.error);
+            setPasswordError("");
+          } else {
+            setPasswordError(result.error ?? "Verkeerd e-mailadres of wachtwoord");
+          }
+          setMessage(null);
+        }
+      })
+      .catch(() => {
+        setPasswordError("Er ging iets mis bij het inloggen. Probeer het opnieuw.");
+      })
+      .finally(() => setIsSubmitting(false));
   };
 
   const formTop = logoTop + logoHeight + 20;
@@ -119,6 +134,7 @@ export default function LoginScreen() {
               fontWeight="700"
               color={palette.cta.primary}
               style={styles.signupLink}
+              onPress={handleNavigateToRegister}
             >
               Account aanmaken
             </ParagraphRegular>
@@ -184,7 +200,7 @@ export default function LoginScreen() {
           <CTAButton
             label="Inloggen"
             onPress={handleLogin}
-            disabled={!canSubmit}
+            disabled={!canSubmit || isSubmitting}
             backgroundColor={canSubmit ? palette.cta.primary : palette.text.abstract}
           />
         </View>
