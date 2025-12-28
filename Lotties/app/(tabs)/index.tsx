@@ -140,7 +140,7 @@ export default function HomeScreen() {
               >
                 <MainHeading>Account aanmaken</MainHeading>
                 <ParagraphRegular style={styles.nextSubtitle}>
-                  Registreer je om je menstruatie en stemming eenvoudig te volgen.
+                  Registreer je en krijg inzicht in je menstruatie en cyclus.
                 </ParagraphRegular>
               </Animated.View>
             </View>
@@ -167,16 +167,6 @@ export default function HomeScreen() {
                     Log in
                   </ParagraphRegular>
                 </View>
-                <FlatButton
-                  label="Doorgaan met Apple"
-                  width={buttonWidth}
-                  height={buttonHeight}
-                  backgroundColor={palette.primary.black}
-                  textColor={palette.primary.white}
-                  borderRadius={0}
-                  icon={<FontAwesome name="apple" size={24} color={palette.primary.white} />}
-                  style={{ marginBottom: buttonSpacing }}
-                />
                 <FlatButton
                   label="Doorgaan met Google"
                   width={buttonWidth}
@@ -286,3 +276,4 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+
