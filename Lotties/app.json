@@ -38,11 +38,16 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "expo-font",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "API_BASE_URL": "https://6463711e-6d80-462d-b8f5-630be77a4bfd.mock.pstmn.io/v1"
     }
   }
 }
