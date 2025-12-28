@@ -2,6 +2,9 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import {
   Animated,
   Easing,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
   StyleSheet,
   View,
   useWindowDimensions,
@@ -25,18 +28,25 @@ export default function HomeScreen() {
   const router = useRouter();
   const { width, height } = useWindowDimensions();
   const progress = React.useRef(new Animated.Value(0)).current;
+  const [isExpanded, setIsExpanded] = React.useState(false);
+  const [isAnimating, setIsAnimating] = React.useState(false);
+  const [showIntro, setShowIntro] = React.useState(true);
 
   const availableHeight = height - insets.top - insets.bottom;
-  const centerLine = availableHeight / 2;
-
+  const horizontalPadding = hs(24, width);
+  const verticalPadding = vs(24, height);
+  const bottomPadding = insets.bottom + layout.ctaBottom + vs(16, height);
+  const sectionSpacing = vs(24, height);
+  const buttonSpacing = vs(16, height);
   const { logoWidth, logoHeight } = getLogoSize(width);
-  const buttonWidth = hs(313, width);
+  const buttonWidth = Math.min(hs(313, width), width - horizontalPadding * 2);
   const buttonHeight = vs(50, height);
-  const initialLogoTop = centerLine - logoHeight;
-  const targetLogoTop = 0;
+  const heroLift = Math.min(vs(60, height), availableHeight * 0.1);
+  const introStartOffset = Math.min(vs(80, height), availableHeight * 0.15);
+
   const logoTranslateY = progress.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, targetLogoTop - initialLogoTop],
+    outputRange: [introStartOffset, -heroLift],
   });
   const subtitleOpacity = progress.interpolate({
     inputRange: [0, 1],
@@ -48,29 +58,35 @@ export default function HomeScreen() {
   });
   const nextTranslateY = progress.interpolate({
     inputRange: [0, 1],
-    outputRange: [20, 0],
-  });
-  const [headingHeight, setHeadingHeight] = React.useState(0);
-  const [loginRowHeight, setLoginRowHeight] = React.useState(0);
-  const textGap = ms(15, 0.2);
-  const contentTop = centerLine - headingHeight - textGap;
-  const authGap = ms(20, 0.2);
-  const ctaPrimaryOpacity = progress.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 0],
+    outputRange: [vs(12, height), 0],
   });
   const ctaSecondaryOpacity = progress.interpolate({
     inputRange: [0, 1],
     outputRange: [0, 1],
   });
+  const ctaSecondaryTranslateY = progress.interpolate({
+    inputRange: [0, 1],
+    outputRange: [vs(6, height), 0],
+  });
+  const introOpacity = progress.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 0],
+  });
 
   const handleStart = () => {
+    if (isAnimating || isExpanded) return;
+
+    setIsAnimating(true);
     Animated.timing(progress, {
       toValue: 1,
       duration: 300,
       easing: Easing.linear,
       useNativeDriver: true,
-    }).start();
+    }).start(() => {
+      setIsExpanded(true);
+      setShowIntro(false);
+      setIsAnimating(false);
+    });
   };
 
   const handleLoginNavigate = () => {
@@ -79,103 +95,130 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <Animated.View
-          style={[
-            styles.logoWrapper,
-            { top: initialLogoTop, transform: [{ translateY: logoTranslateY }] },
-          ]}
-        >
-          <LottiesLogo width={logoWidth} height={logoHeight} />
-        </Animated.View>
-        <Animated.Text
-          style={[styles.subtitle, { top: centerLine, opacity: subtitleOpacity }]}
-        >
-          Jouw cyclusapp
-        </Animated.Text>
-        <Animated.View
-          style={[
-            styles.nextContent,
-            {
-              top: contentTop,
-              opacity: nextOpacity,
-              transform: [{ translateY: nextTranslateY }],
-            },
-          ]}
-        >
-          <MainHeading
-            onLayout={(event) => setHeadingHeight(event.nativeEvent.layout.height)}
-          >
-            Account aanmaken
-          </MainHeading>
-          <ParagraphRegular style={styles.nextSubtitle}>
-            Registreer je om je menstruatie en stemming eenvoudig te volgen.
-          </ParagraphRegular>
-        </Animated.View>
-        <View style={[styles.ctaArea, { bottom: layout.ctaBottom, width: buttonWidth }]}>
-          <Animated.View
-            style={[
-              styles.primaryButton,
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoider}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <View style={styles.screen}>
+          <ScrollView
+            contentContainerStyle={[
+              styles.scrollContent,
               {
-                opacity: ctaPrimaryOpacity,
-                width: buttonWidth,
-                top: loginRowHeight + 20 + (buttonHeight + authGap) * 2,
+                paddingTop: insets.top + verticalPadding,
+                paddingBottom: bottomPadding,
+                paddingHorizontal: horizontalPadding,
               },
             ]}
-            pointerEvents="box-none"
+            keyboardShouldPersistTaps="handled"
+            bounces={false}
+            showsVerticalScrollIndicator={false}
           >
-            <CTAButton label="Begin nu" onPress={handleStart} />
-          </Animated.View>
-          <Animated.View
-            style={[
-              styles.authButtons,
-              { opacity: ctaSecondaryOpacity, width: buttonWidth, gap: authGap },
-            ]}
-          >
-            <View
-              style={styles.loginRow}
-              onLayout={(event) => setLoginRowHeight(event.nativeEvent.layout.height)}
-            >
-              <ParagraphRegular>Heb je al een account?</ParagraphRegular>
-              <ParagraphRegular
-                color={palette.cta.primary}
-                fontWeight="700"
-                style={styles.loginLink}
-                onPress={handleLoginNavigate}
+            <View style={[styles.mainContent, { paddingBottom: sectionSpacing }]}>
+              <Animated.View
+                style={[
+                  styles.hero,
+                  { transform: [{ translateY: logoTranslateY }] },
+                ]}
               >
-                Log in
-              </ParagraphRegular>
+                <LottiesLogo width={logoWidth} height={logoHeight} />
+                <Animated.Text
+                  style={[styles.subtitle, { opacity: subtitleOpacity }]}
+                >
+                  Jouw cyclusapp
+                </Animated.Text>
+              </Animated.View>
+              <Animated.View
+                style={[
+                  styles.nextContent,
+                  {
+                    marginTop: sectionSpacing,
+                    opacity: nextOpacity,
+                    transform: [{ translateY: nextTranslateY }],
+                  },
+                ]}
+                pointerEvents={isExpanded ? "auto" : "none"}
+              >
+                <MainHeading>Account aanmaken</MainHeading>
+                <ParagraphRegular style={styles.nextSubtitle}>
+                  Registreer je om je menstruatie en stemming eenvoudig te volgen.
+                </ParagraphRegular>
+              </Animated.View>
             </View>
-            <FlatButton
-              label="Doorgaan met Apple"
-              width={buttonWidth}
-              height={buttonHeight}
-              backgroundColor={palette.primary.black}
-              textColor={palette.primary.white}
-              borderRadius={0}
-              icon={<FontAwesome name="apple" size={24} color={palette.primary.white} />}
-            />
-            <FlatButton
-              label="Doorgaan met Google"
-              width={buttonWidth}
-              height={buttonHeight}
-              backgroundColor={palette.primary.white}
-              textColor="#3C4043"
-              borderRadius={0}
-              icon={<FontAwesome name="google" size={24} color="#3C4043" />}
-            />
-            <FlatButton
-              label="Doorgaan met e-mail"
-              width={buttonWidth}
-              height={buttonHeight}
-              backgroundColor={palette.background.navigation}
-              textColor={palette.primary.black}
-              borderRadius={0}
-              icon={<FontAwesome name="envelope-o" size={22} color={palette.primary.black} />}
-            />
-          </Animated.View>
+            <View style={[styles.ctaArea, { marginTop: sectionSpacing }]}>
+              <Animated.View
+                pointerEvents={isExpanded ? "auto" : "none"}
+                style={[
+                  styles.authButtons,
+                  {
+                    width: buttonWidth,
+                    opacity: ctaSecondaryOpacity,
+                    transform: [{ translateY: ctaSecondaryTranslateY }],
+                  },
+                ]}
+              >
+                <View style={[styles.loginRow, { marginBottom: buttonSpacing }]}>
+                  <ParagraphRegular>Heb je al een account?</ParagraphRegular>
+                  <ParagraphRegular
+                    color={palette.cta.primary}
+                    fontWeight="700"
+                    style={[styles.loginLink, { marginLeft: 6 }]}
+                    onPress={handleLoginNavigate}
+                  >
+                    Log in
+                  </ParagraphRegular>
+                </View>
+                <FlatButton
+                  label="Doorgaan met Apple"
+                  width={buttonWidth}
+                  height={buttonHeight}
+                  backgroundColor={palette.primary.black}
+                  textColor={palette.primary.white}
+                  borderRadius={0}
+                  icon={<FontAwesome name="apple" size={24} color={palette.primary.white} />}
+                  style={{ marginBottom: buttonSpacing }}
+                />
+                <FlatButton
+                  label="Doorgaan met Google"
+                  width={buttonWidth}
+                  height={buttonHeight}
+                  backgroundColor={palette.primary.white}
+                  textColor="#3C4043"
+                  borderRadius={0}
+                  icon={<FontAwesome name="google" size={24} color="#3C4043" />}
+                  style={{ marginBottom: buttonSpacing }}
+                />
+                <FlatButton
+                  label="Doorgaan met e-mail"
+                  width={buttonWidth}
+                  height={buttonHeight}
+                  backgroundColor={palette.background.navigation}
+                  textColor={palette.primary.black}
+                  borderRadius={0}
+                  icon={<FontAwesome name="envelope-o" size={22} color={palette.primary.black} />}
+                />
+              </Animated.View>
+            </View>
+          </ScrollView>
+          {showIntro ? (
+            <Animated.View
+              pointerEvents="auto"
+              style={[
+                styles.introOverlay,
+                {
+                  paddingTop: insets.top + verticalPadding,
+                  paddingBottom: bottomPadding,
+                  paddingHorizontal: horizontalPadding,
+                  opacity: introOpacity,
+                },
+              ]}
+            >
+              <View style={styles.introCTAContainer}>
+                <CTAButton label="Begin nu" onPress={handleStart} />
+              </View>
+            </Animated.View>
+          ) : null}
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -185,50 +228,61 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: palette.background.main,
   },
-  container: {
+  keyboardAvoider: {
     flex: 1,
-    position: "relative",
-    backgroundColor: palette.background.main,
   },
-  logoWrapper: {
-    position: "absolute",
-    alignSelf: "center",
+  screen: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  mainContent: {
+    flexGrow: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  hero: {
+    alignItems: "center",
   },
   subtitle: {
-    position: "absolute",
-    alignSelf: "center",
+    marginTop: ms(8, 0.2),
     color: palette.text.main,
     fontFamily: typography.fontFamily.secondary,
     fontWeight: "400",
     fontSize: ms(18, 0.2),
+    textAlign: "center",
   },
   nextContent: {
-    position: "absolute",
-    alignSelf: "center",
-    width: "80%",
+    alignItems: "center",
+    paddingHorizontal: "5%",
   },
   nextSubtitle: {
     marginTop: ms(15, 0.2),
+    textAlign: "center",
   },
   ctaArea: {
-    position: "absolute",
-    alignSelf: "center",
-  },
-  primaryButton: {
-    position: "absolute",
-    top: 0,
-    alignSelf: "center",
+    width: "100%",
+    alignItems: "center",
   },
   authButtons: {
-    flexDirection: "column",
     alignItems: "center",
   },
   loginRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    flexWrap: "wrap",
   },
   loginLink: {
     marginLeft: 5,
+  },
+  introOverlay: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  introCTAContainer: {
+    alignItems: "center",
+    justifyContent: "flex-end",
+    flex: 1,
   },
 });
