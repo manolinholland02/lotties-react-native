@@ -1,6 +1,6 @@
 export const palette = {
   background: {
-    main: "#E7F1F7",
+    main: "#FFEFED",
     navigation: "#92B7BB",
     headerOrFooter: "#01434C",
   },
